@@ -19,8 +19,17 @@ int get_files_in_path(char* path)
 {
 	char** sub_directories;
 	char tmp_path[BUF_SIZE];
-	strcpy(tmp_path , path);
 	int i, inode_number = 1;
+
+	int len = strlen(path);
+	if (path[len - 1] == '\n' || path[len - 1] == '/') {
+		if (path[len - 1] == '\n' && len > 1 && path[len - 2] == '/') {
+			path[len - 2] = 0;
+		}
+		path[len - 1] = 0;
+	}
+
+	strcpy(tmp_path , path);
 
 	if(split_path(tmp_path, &sub_directories) == -1)
 	{
@@ -41,7 +50,10 @@ int get_files_in_path(char* path)
 	}
 
 	// we found bad path
-	if (badPath) inode_number = 1;
+	if (badPath) {
+		inode_number = 1;
+		printf("%s: File not found by ext2_lookup\n", path);
+	}
 
 	struct ext2_inode inode, temp_inode;
 	int j, db_length;
@@ -93,7 +105,9 @@ int get_files_in_path(char* path)
 		}
 	}
 
-	return 0;
+	printf("\n");
+
+	return badPath;
 }
 
 int
@@ -173,11 +187,9 @@ main(int argc, char *argv[])
 	}
 
 	if ( get_files_in_path(dir_name) != 0 ) {
-		printf("[ERROR] couldn't get files in path\n");
+		//printf("[ERROR] couldn't get files in path\n");
 		exit(1);
 	}
-
-	printf("\n");
 
 	return 0;
 }
