@@ -28,15 +28,20 @@ int get_files_in_path(char* path)
 		return -1;
 	}
 
+	char badPath = 0;
 	struct ext2_dir_entry_2 current_entry;
 	for(i=0; sub_directories[i] != NULL; i++)
 	{
 		if (get_dir_entry(&current_entry, sub_directories[i], inode_number) == -1)
 		{
-			return -1;
+			badPath = 1;
+			break;
 		}
 		inode_number = current_entry.inode - 1;
 	}
+
+	// we found bad path
+	if (badPath) inode_number = 1;
 
 	struct ext2_inode inode, temp_inode;
 	int j, db_length;

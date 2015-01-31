@@ -130,7 +130,14 @@ int get_dir_entry( struct ext2_dir_entry_2 *dir_pointer, char* entry_name, int i
 
 int split_path(char* path, char*** result)
 {
+	int len;
+
 	char** sub_directories;
+
+	len = strlen(path);
+	if (path[len - 1] == '\n')
+		path[len - 1] = 0;
+
 	char* entry_name= strtok(path, "/");
 	int entries_number = 0;
 	sub_directories = (char**)malloc(sizeof(char*) * 1);
